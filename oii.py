@@ -1,2 +1,2 @@
-def func(x):
+def oi(x):
     print(x)
