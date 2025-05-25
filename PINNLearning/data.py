@@ -1,17 +1,5 @@
-from tensorflow import GradientTape, convert_to_tensor, float32
+from tensorflow import convert_to_tensor, float32
 import numpy as np
-
-
-# Implementation of the initially simplified ODE, returns the residual
-def simp_ode(model, inp):
-    with GradientTape(persistent=True) as tape:
-        tape.watch(inp)
-        y_pred = model(inp)
-
-        y_x = tape.gradient(y_pred, inp)
-        y_xx = tape.gradient(y_x, inp)
-    del tape
-    return y_pred - y_xx
 
 
 # Calculate the analytical solution for the set points
@@ -36,9 +24,3 @@ def set_boundaries(x_bc, y_bc):
     y = convert_to_tensor(y, dtype=float32)
 
     return x, y
-
-
-if __name__ == '__main__':
-    # test = gen_data(0, 1, 10)
-    test = simp_sol(0.5)
-    print(test)
