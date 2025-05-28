@@ -1,6 +1,9 @@
-# Skeleton
+# PINN Testbench
 
-Skeleton for numerical projects with Python. This skeleton uses [numpy](https://numpy.org/) and [pytest](https://pytest.org). Rename the `python_skeleton` subdirectory to your module name.
+A testing ground for different implementations of physics informed neural networks (PINNs) for the purpose of solving differential equations with variing complexity.
+The various implementations are included as jupyter notebooks in the `examples` subdirectory. In `PINNLearning` the corresponding functions are implemented.
+The implementations are based on the [Tensorflow](https://www.tensorflow.org) and [Keras](https://keras.io) packages. However they can also be converted with minor effort to [PyTorch](https://pytorch.org).
+
 
 ## Tests
 
