@@ -26,9 +26,9 @@ def set_boundaries(x_bc, y_bc):
 
 # Simulate the ODE accross the given discretized range
 def simp_sim(disc_x, y_bc, noise_level=0.02):
-    # improves speed
+    # improves speed as numpy doesnt like Tf tensors
     if isinstance(disc_x, tf.Tensor):
-        disc_x = disc_x.numpy()
+        disc_x = disc_x.numpy().reshape(-1,)
 
     # calculate the discretization step
     del_x = disc_x[1] - disc_x[0]
@@ -37,11 +37,13 @@ def simp_sim(disc_x, y_bc, noise_level=0.02):
     # initialze the solution vector
     u = np.zeros(num_points)
 
-    for _ in range(80 * num_points):
-        # enforce the boundary conditions in the solution
-        u[0] = y_bc[0][0]
-        u[-1] = y_bc[1][0]
+    # enforce the boundary conditions in the solution
+    # as the iteration below doesnt cover these points,
+    # they dont need to be reset
+    u[0] = y_bc[0][0]
+    u[-1] = y_bc[1][0]
 
+    for _ in range(80 * num_points):  # important for convergence
         u_cp = u.copy()
 
         for i in range(1, num_points - 1):
@@ -51,4 +53,7 @@ def simp_sim(disc_x, y_bc, noise_level=0.02):
     noise = noise_level * np.random.normal(0, 0.5, size=u.shape)
     u_noisy = u + noise
 
-    return u, u_noisy
+    # reshape into the same data format as the gen_data
+    # --> as these values will not be directly entered into a model,
+    # they dont need to be a TF tensor
+    return u.reshape(-1, 1), u_noisy.reshape(-1, 1)

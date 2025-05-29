@@ -4,7 +4,7 @@ from keras import optimizers
 
 # Implementation of the initially simplified ODE as the loss
 # based on the residual and the boundary conditions
-def simp_loss(model, inp, x_bc, y_bc):
+def oneD_loss(model, inp, x_bc, y_bc):
     # Get the "output" from the model as values of the target function
     # and calculate the derivates with respect to the input features
     with GradientTape(persistent=True) as tape:
@@ -41,7 +41,8 @@ def learning_rate_schedule(init, steps, rate):
 
 
 # Implementing the training function
-def train(model, x_train, x_bc, y_bc, lr_schedule=None, threshold=1e-9, write=True):
+def train(model, x_train, x_bc, y_bc, loss_func, lr_schedule=None,
+          threshold=1e-9, write=True):
     loss_time = []
 
     # enable setting of a learning rate scheduler
@@ -57,7 +58,7 @@ def train(model, x_train, x_bc, y_bc, lr_schedule=None, threshold=1e-9, write=Tr
     while abs(delta_loss) > threshold:
         # calculate the forward pass
         with GradientTape() as tape:
-            loss = simp_loss(model, x_train, x_bc, y_bc)
+            loss = loss_func(model, x_train, x_bc, y_bc)
 
         # calculate the backwards pass
         # first calculate the gradients
