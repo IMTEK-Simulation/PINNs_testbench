@@ -20,7 +20,10 @@ dependencies = [
     "ipykernal",
     "numpy",
     "tensorflow",
-    "keras"
+    "keras",
+    "keras_tuner",
+    "scipy",
+    "scikit-learn"
 ]
 
 [project.optional-dependencies]
