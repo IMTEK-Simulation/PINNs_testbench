@@ -1,5 +1,9 @@
 from keras import Sequential, layers, regularizers
 
+# FYI: The implementation here is made to be flexible and support various
+# different use-cases. This is typically not necessary, as such the code
+# could can be largely simplified.
+
 
 # Function to dynamically create the model with adjustable number of hidden
 # layers and weights per hidden layer

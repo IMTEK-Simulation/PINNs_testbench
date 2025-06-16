@@ -18,12 +18,15 @@ requires-python = ">=3.9.0,<3.12.0"
 dynamic = [ "version" ]
 dependencies = [
     "ipykernal",
+    "ipywidgets",
     "numpy",
     "tensorflow",
     "keras",
-    "keras_tuner",
-    "scipy",
-    "scikit-learn"
+    "ray",
+    "pandas",
+    "pyarrow",
+    "optuna",
+    "hpbandster"
 ]
 
 [project.optional-dependencies]
