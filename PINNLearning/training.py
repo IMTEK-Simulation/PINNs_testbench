@@ -9,7 +9,7 @@ from keras import optimizers
 # Implementation of the initially simplified ODE as the loss
 # based on the residual and the boundary conditions
 def oneD_loss(model, inp, x_bc, y_bc, alph=None):
-    # Get the "output" from the model as values of the target function
+    # get the "output" from the model as values of the target function
     # and calculate the derivates with respect to the input features
     with GradientTape(persistent=True) as tape:
         tape.watch(inp)
@@ -87,7 +87,7 @@ def train(model, x_train, x_bc, y_bc, loss_func, lr_schedule=None,
 
         # stop if it takes too long
         if epoch >= limit:
-            print("DID NOT CONVERGE!")
+            print("BROKEN OFF TRANING: Did not converge!")
             break
         # print current state
         elif epoch % 100 == 0 and write:

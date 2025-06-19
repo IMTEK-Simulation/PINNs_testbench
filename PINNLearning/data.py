@@ -10,14 +10,6 @@ def simp_sol(inp):
     return numer/denom
 
 
-# Calculate the analytical solution in inhomogenous material
-def simp_sol_var_mat(inp, alph):
-    scal = np.sqrt(1/alph(inp))
-    numer = np.exp(-inp*scal) * (np.exp(2*scal) - np.exp(2*scal*inp))
-    denom = np.exp(2*scal) - 1
-    return numer/denom
-
-
 # Generate data points in a range as tf tensores
 def gen_data(start, end, num):
     # generate the data pouits and reshape them into a row vector
@@ -46,7 +38,7 @@ def add_noise(arr, noise_level, end_values=True, bounds=None):
 
 
 # Simulate the ODE accross the given discretized range
-def simp_sim(disc_x, y_bc, noise_level=0.02):
+def simp_sim(disc_x, y_bc, threshold=1e-6, noise_level=0.02, alph=None):
     # improves speed as numpy doesnt like Tf tensors
     if isinstance(disc_x, tf.Tensor):
         disc_x = disc_x.numpy().reshape(-1,)
@@ -58,17 +50,31 @@ def simp_sim(disc_x, y_bc, noise_level=0.02):
     # initialze the solution vector
     u = np.zeros(num_points)
 
+    # check if a varying diffusion constant was provided
+    # --> adjust the finite differences if necessary
+    if alph is not None:
+        def denom(i):
+            return (del_x**2/alph(i * del_x) + 2)
+    else:
+        def denom(i):
+            return (del_x**2 + 2)
+
     # enforce the boundary conditions in the solution
     # as the iteration below doesnt cover these points,
     # they dont need to be reset
     u[0] = y_bc[0][0]
     u[-1] = y_bc[1][0]
 
-    for _ in range(80 * num_points):  # important for convergence
+    for _ in range(80 * num_points):  # scale for convergence
         u_cp = u.copy()
 
         for i in range(1, num_points - 1):
-            u[i] = (u_cp[i + 1] + u_cp[i - 1]) / (del_x**2 + 2)
+            u[i] = (u_cp[i + 1] + u_cp[i - 1]) / denom(i)
+
+        # Check convergence, stop early if possible
+        diff = np.max(np.abs(u - u_cp))
+        if diff < threshold:
+            break
 
     # add some additional noise to make it more escentric
     u_noisy = add_noise(u, noise_level)
