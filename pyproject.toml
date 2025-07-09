@@ -18,7 +18,9 @@ requires-python = ">=3.9.0,<3.12.0"
 dynamic = [ "version" ]
 dependencies = [
     "ipykernal",
+    "nbformat",
     "ipywidgets",
+    "plotly",
     "numpy",
     "tensorflow",
     "keras",
@@ -26,7 +28,8 @@ dependencies = [
     "pandas",
     "pyarrow",
     "optuna",
-    "hpbandster"
+    "hpbandster",
+    "deepxde"
 ]
 
 [project.optional-dependencies]
