@@ -1,0 +1,19 @@
+{
+  "epochs": 600,
+  "init_lr": 0.0005,
+  "l2_penalty": 0.366,
+  "num_layers": 7,
+  "num_weights_layer_1": 34,
+  "num_weights_layer_10": 11,
+  "num_weights_layer_11": 8,
+  "num_weights_layer_2": 41,
+  "num_weights_layer_3": 43,
+  "num_weights_layer_4": 3,
+  "num_weights_layer_5": 2,
+  "num_weights_layer_6": 45,
+  "num_weights_layer_7": 21,
+  "num_weights_layer_8": 41,
+  "num_weights_layer_9": 29,
+  "reduct_rate_lr": 0.34,
+  "reduct_steps_lr": 445
+}
