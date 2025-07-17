@@ -1,3 +1,0 @@
-# ignore all pycashes
-__pycache__/
-*.pyc

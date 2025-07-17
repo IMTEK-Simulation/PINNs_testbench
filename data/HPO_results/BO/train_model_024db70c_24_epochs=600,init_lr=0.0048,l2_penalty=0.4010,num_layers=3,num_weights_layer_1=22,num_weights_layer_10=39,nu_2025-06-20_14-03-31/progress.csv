@@ -1,2 +1,0 @@
-loss,timestamp,checkpoint_dir_name,done,training_iteration,trial_id,date,time_this_iter_s,time_total_s,pid,hostname,node_ip,time_since_restore,iterations_since_restore
-0.16793768107891083,1750421159,,False,1,024db70c,2025-06-20_14-05-59,126.58328199386597,126.58328199386597,51977,fp-10-126-142-66.eduroam-fp.privat,127.0.0.1,126.58328199386597,1
