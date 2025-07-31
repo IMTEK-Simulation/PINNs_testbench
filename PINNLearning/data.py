@@ -48,16 +48,21 @@ def set_2D_boundaries(x_bc, y_bc, vec_sec_dim):
     # extend the boundary positon tensors to match the length of the vec_sec
     x_extended = [np.resize(i, (vec_sec_dim.shape[0], 1)) for i in x_bc]
     # join the arrays of the boundary positions with the vec_sec
-    x_list = [tf.concat([conv_data(i), vec_sec_dim], axis=1) for i in x_extended[:2]]
+    x_list = [tf.concat([conv_data(i), vec_sec_dim], axis=1)
+              for i in x_extended[:2]]
     # if boundary conditions for multiple dimensions are given add them as well
     if len(x_bc) > 2:
-        z_list = [tf.concat([vec_sec_dim, conv_data(i)], axis=1) for i in x_extended[2:]]
+        # remove the first and last elememt to prevent double assiging corners
+        z_list = [tf.concat([vec_sec_dim, conv_data(i)], axis=1)[1:-1]
+                  for i in x_extended[2:]]
         x_list += z_list
     # join the upper and lower bounds to reform the position vector
     x = tf.concat(x_list, axis=0)
 
     # extend the boundary value tensors to match the length of the vec_sec
-    y_extended = [tf.constant(i, shape=(vec_sec_dim.shape[0], 1)) for i in y_bc]
+    # if the nummber of conditions are >2 then reduce the dimension to match x
+    y_extended = [tf.constant(i, shape=(vec_sec_dim.shape[0] - int(idx>=2) * 2, 1))
+                  for idx, i in enumerate(y_bc)]
     # join the values for the upper and lower positons
     y = tf.concat(y_extended, axis=0)
 
@@ -233,8 +238,8 @@ def twoD_sim(disc_x, y_bc, threshold=1e-6):
     u[-1, :] = y_bc[1][0]
 
     # set initial Neumann boundary conditions
-    u[:, 0] = -y_bc[2][0] * del_xz
-    u[:, -1] = y_bc[3][0] * del_xz
+    u[1:-1, 0] = -y_bc[2][0] * del_xz
+    u[1:-1, -1] = y_bc[3][0] * del_xz
 
     for _ in range(80 * num_points):  # scale for convergence
         u_cp = u.copy()
@@ -245,8 +250,8 @@ def twoD_sim(disc_x, y_bc, threshold=1e-6):
         ) / denom
 
         # enforce Neumann boundary conditions
-        u[:, 0] = u[:, 1] - y_bc[2][0] * del_xz
-        u[:, -1] = u[:, -2] + y_bc[3][0] * del_xz
+        u[1:-1, 0] = u[1:-1, 1] - y_bc[2][0] * del_xz
+        u[1:-1, -1] = u[1:-1, -2] + y_bc[3][0] * del_xz
 
         # Check convergence, stop early if possible
         diff = np.max(np.abs(u - u_cp))

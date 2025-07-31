@@ -38,6 +38,55 @@ def int_3D_plot(X, Y, Z, title=None, xlabel='x', ylabel='y', zlabel='z'):
     return fig
 
 
+# A wrapper that uses the int_3D_plot to allows displaying the solutions for
+# discretized steps in one domain provided via a list of data vectors in one
+# graph and allows switching between them using a slider
+def mult_3D_plot(X, Y, z_list, time_steps, title=None, xlabel='x', ylabel='y', zlabel='z'):
+
+    # generate a figure for each input data vector
+    figs = [int_3D_plot(X, Y, z, title, xlabel, ylabel, zlabel)
+            for z in z_list]
+
+    # extract traces and set only the first one to be initial visibile
+    data = []
+    for i, fig in enumerate(figs):
+        for trace in fig.data:
+            trace.visible = True if i == 0 else False
+            data.append(trace)
+
+    # create the steps for the slider
+    steps = []
+    for i in range(len(time_steps)):
+        # boolean list of visibility for each time step
+        visible = [False] * len(data)
+        visible[i] = True
+
+        step = dict(
+            method="update",              # only "update" figure
+            args=[{"visible": visible}],  # toggle visibility of traces
+            label=str(time_steps[i])      # name to be displayed on slider
+        )
+        steps.append(step)
+
+    # set the look of the slider
+    sliders = [dict(
+        active=0,
+        currentvalue={"prefix": "Time: "},
+        pad={"t": -10},  # top
+        len=0.8,
+        x=0.1,
+        y=0,
+        steps=steps
+    )]
+
+    # use layout from first fig as base, add sliders
+    layout = figs[0].layout
+    layout.update(sliders=sliders)
+
+    slider_fig = go.Figure(data=data, layout=layout)
+    return slider_fig
+
+
 # Plots a slideshow of the given graphs. For this purpose, the data must be
 # presented as a list of 2D data sets.
 def plot_animated(data, pause=0.001, iterator=1):

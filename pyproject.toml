@@ -4,14 +4,14 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "PINNs_testbench"
-description = "A testing ground for PINNs"
+description = "A testing and teaching ground for PINNs"
 readme = "README.md"
 license = { file = "LICENSE.md" }
 authors = [
     { name = "Micha Erkel", email = "micha.erkel@email.uni-freiburg.de" }
 ]
 classifiers = [
-    "Development Status :: Alpha",
+    "Development Status :: Beta",
     "Programming Language :: Python"
 ]
 requires-python = ">=3.9.0,<3.12.0"
@@ -24,7 +24,6 @@ dependencies = [
     "pydot",
     "numpy",
     "tensorflow",
-    "keras",
     "ray",
     "pandas",
     "pyarrow",
@@ -48,5 +47,5 @@ pythonpath = [
 
 [project.urls]
 documentation = "https://imtek-simulation.github.io/python-skeleton/"
-repository = "https://github.com/imtek-simulation/python-skeleton"
-changelog = "https://github.com/imtek-simulation/python-skeleton/blob/master/CHANGELOG.md"
+repository = "https://github.com/IMTEK-Simulation/PINNs_testbench"
+changelog = "https://github.com/IMTEK-Simulation/PINNs_testbench/blob/main/CHANGELOG.md"

@@ -1,6 +1,6 @@
 from tensorflow import GradientTape, reduce_mean, square, constant, \
-    tile, shape, data, split
-from keras import optimizers
+    tile, shape, data, split, distribute, keras
+import tensorflow as tf
 
 # FYI: All implementations here are made to be flexible and support various
 # different use-cases. This is typically not necessary, as such the code
@@ -24,8 +24,7 @@ def oneD_loss(model, inp, x_bc, y_bc, alph=None):
 
         y_x = tape1.gradient(y_pred, inp)
         if alph is not None:
-            # adjust the derivative for a inhomogenuous
-            # material distribution
+            # adjust the derivative for a inhomogenuous material distribution
             y_x = alph(inp) * y_x
     y_xx = tape2.gradient(y_x, inp)
 
@@ -141,7 +140,7 @@ def time_loss(model, inp, x_bc, y_bc, init_sol):
 
 # Define an learning rate schedule to improve convergence
 def learning_rate_schedule(init, steps, rate):
-    return optimizers.schedules.ExponentialDecay(
+    return keras.optimizers.schedules.ExponentialDecay(
         initial_learning_rate=init,
         decay_steps=steps,
         decay_rate=rate
@@ -150,13 +149,13 @@ def learning_rate_schedule(init, steps, rate):
 
 # Split the x_train set into batches of the size batch_size and enable the
 # distribution of these batches across the CPU
-def data_batch(data_set, batch_size):
+def data_batch(data_set, batch_size, strategy):
     # create a tf dataset fromt the given tf tensor, shuffle and batch it
     data_batched = data.Dataset.from_tensor_slices(data_set)
     data_batched = data_batched.shuffle(buffer_size=1024)
     data_batched = data_batched.batch(batch_size)
     data_batched = data_batched.prefetch(data.AUTOTUNE)
-    return data_batched
+    return strategy.experimental_distribute_dataset(data_batched)
 
 
 # Definition of the inidvidual steps in training a NN
@@ -174,20 +173,49 @@ def train_step(model, x_train, x_bc, y_bc, loss_func, optimizer):
     return loss
 
 
+# A wrapper to improve the performance of parallelism in batching
+@tf.function
+def distributed_train_step(strategy, model, x_batched, x_bc, y_bc, loss_func, optimizer):
+    # distribute the samples in one batch across the CPUs/GPUs
+    per_replica_loss = strategy.run(
+                    train_step, args=(model, x_batched, x_bc, y_bc, loss_func, optimizer)
+                )
+    # FYI: The strategy will compute the gradient for each subset of the batch
+    # and averages it across all subsets. The update to the model is
+    # synchronized and thus does not differ to the computation on a single device.
+
+    # sum up the computed losses of all distributed instances
+    batch_loss = strategy.reduce(distribute.ReduceOp.SUM, per_replica_loss, axis=None)
+
+    return batch_loss
+
+
 # Implementing the training function
 def train(model, x_train, x_bc, y_bc, loss_func, lr_schedule=None,
           limit=3500, threshold=1e-9, batch=None, write=True):
     loss_time = []
 
-    # enable batching of x_train
+    # batch x_train in size of 'batch' is set
     if batch is not None:
-        x_batched = data_batch(x_train, batch)
+        # activate the distribution strategy for the batches
+        strategy = distribute.MirroredStrategy()
+        print('Number of devices:', strategy.num_replicas_in_sync)
+        # batch the data
+        x_batched = data_batch(x_train, batch, strategy)
 
-    # enable setting of a learning rate scheduler
-    if lr_schedule is not None:
-        optimizer = optimizers.Adam(learning_rate=lr_schedule)
+        # enable maintenance of the sheduler across distributed instances
+        with strategy.scope():
+            # enable setting of a learning rate scheduler
+            if lr_schedule is not None:
+                optimizer = keras.optimizers.Adam(learning_rate=lr_schedule)
+            else:
+                optimizer = keras.optimizers.Adam()
     else:
-        optimizer = optimizers.Adam()
+        # enable setting of a learning rate scheduler
+        if lr_schedule is not None:
+            optimizer = keras.optimizers.Adam(learning_rate=lr_schedule)
+        else:
+            optimizer = keras.optimizers.Adam()
 
     # train the model until change in loss is below a threshold
     delta_loss = 1
@@ -198,7 +226,8 @@ def train(model, x_train, x_bc, y_bc, loss_func, lr_schedule=None,
         if batch is not None:
             loss = 0
             for batch in x_batched:
-                loss += train_step(model, batch, x_bc, y_bc, loss_func, optimizer)
+                loss += distributed_train_step(strategy, model, batch, x_bc, 
+                                               y_bc, loss_func, optimizer)
         else:
             loss = train_step(model, x_train, x_bc, y_bc, loss_func, optimizer)
 

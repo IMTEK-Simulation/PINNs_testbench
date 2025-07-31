@@ -8,6 +8,15 @@ v0.0.1
 v0.0.2
 ------
 
-* Initial problem solved
-* Tests are added for the learnung functions
-* Other tests
+* Initial 1D problems solved
+
+v0.0.3
+------
+
+* HPO notebook created
+* Started implementation of the 2D Problems
+
+v0.1.0
+------
+
+* Finalized all general problems

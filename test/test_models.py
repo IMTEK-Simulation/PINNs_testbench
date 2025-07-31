@@ -25,9 +25,7 @@
 import sys
 import os
 
-from torch import index_copy
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from math import ceil, floor
 from PINNLearning.models import create_model
 
 

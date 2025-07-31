@@ -1,0 +1,2 @@
+model_checkpoint_path: "2D_model-9000.ckpt"
+all_model_checkpoint_paths: "2D_model-9000.ckpt"
