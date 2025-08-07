@@ -10,7 +10,7 @@ The initial problem setup and basic information about deep learning and PINNs is
 More complicated problems are posed in `2D & time dependent`.
 A excursion about the more in-depth but interesting topics of **hyperparameter optimization (HPO)** and **neural architeture search (NAS)** is provided in the corresponding notebook.
 
-Finaly a special application of PINNs is considered in `Specific Problems`.
+Finaly a special application of PINNs is considered in `Special Problems`.
 
 
 ## Tests

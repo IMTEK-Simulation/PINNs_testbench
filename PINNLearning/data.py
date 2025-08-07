@@ -157,7 +157,7 @@ def alph_sim(disc_x, y_bc, alph, threshold=1e-6):
             u[i] = (alph_r * u_cp[i + 1] + alph_l * u_cp[i - 1]) \
                 / (del_x**2 + alph_l + alph_r)
 
-        # Check convergence, stop early if possible
+        # check convergence, stop early if possible
         diff = np.max(np.abs(u - u_cp))
         if diff < threshold:
             break

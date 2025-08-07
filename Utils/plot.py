@@ -147,6 +147,39 @@ def simp_plot(data, title, xlabel='x', ylabel='y'):
     return plt
 
 
+# A wrapper enabeling plotting of multiple entries in a single
+# data object in one graph
+def mult_2D_plot(data_lists, title, xlabel='x', ylabel='y'):
+    # create a list to hold the individual plot data series
+    all_plot_data = []
+
+    for data_set in data_lists:
+        # unpack the data object
+        x_points = data_set[0]
+        list_of_y_points = data_set[1]
+        plot_args = data_set[2:]
+
+        # loop through each y-series and create a plot data series for it
+        for y_points in list_of_y_points:
+            # create the data series in the format required by simp_plot
+            data_series = [x_points, y_points] + plot_args
+            all_plot_data.append(data_series)
+
+    # call simp_plot with the combined data
+    plt_obj = simp_plot(all_plot_data, title, xlabel, ylabel)
+
+    # modify the legend
+    if len(all_plot_data) > 1:
+        # get the data of all legend entries
+        handles, labels = plt_obj.gca().get_legend_handles_labels()
+        # casting to dict automatically reduces to only unique ones
+        by_label = dict(zip(labels, handles))
+        # return the entry data from dict and position the legend outside
+        plt_obj.legend(by_label.values(), by_label.keys(),
+                       bbox_to_anchor=(1.03, 0.5), loc='center left')
+    return plt_obj
+
+
 # Plotting function for a single graph with y axis scaled in log10
 def plot_err_vs_epoch(data, title, xlabel='x', ylabel='y'):
     # ensure that data is a single list
