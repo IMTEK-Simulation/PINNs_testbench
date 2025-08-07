@@ -1,0 +1,2 @@
+model_checkpoint_path: "inverse_simp-2000.ckpt"
+all_model_checkpoint_paths: "inverse_simp-2000.ckpt"

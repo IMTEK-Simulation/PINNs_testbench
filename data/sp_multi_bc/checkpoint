@@ -1,0 +1,2 @@
+model_checkpoint_path: "multi_bc-4000.ckpt"
+all_model_checkpoint_paths: "multi_bc-4000.ckpt"
