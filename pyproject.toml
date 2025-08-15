@@ -14,7 +14,7 @@ classifiers = [
     "Development Status :: Beta",
     "Programming Language :: Python"
 ]
-requires-python = ">=3.9.0,<3.12.0"
+requires-python = ">=3.10.0,<3.12.0"
 dynamic = [ "version" ]
 dependencies = [
     "ipykernel",
@@ -46,6 +46,6 @@ pythonpath = [
 ]
 
 [project.urls]
-documentation = "https://imtek-simulation.github.io/python-skeleton/"
+documentation = "https://github.com/IMTEK-Simulation/PINNs_testbench"
 repository = "https://github.com/IMTEK-Simulation/PINNs_testbench"
 changelog = "https://github.com/IMTEK-Simulation/PINNs_testbench/blob/main/CHANGELOG.md"

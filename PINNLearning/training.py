@@ -74,8 +74,8 @@ def twoD_loss(model, inp, x_bc, y_bc):
 
     # split boundaries into Dirichlet and Neumann
     split_point = shape(x_bc)[0]//2
-    x_bc_dir, x_bc_neu = split(x_bc,[split_point, shape(x_bc)[0]-split_point],axis=0)
-    y_bc_dir, y_bc_neu = split(y_bc,[split_point, shape(x_bc)[0]-split_point],axis=0)
+    x_bc_dir, x_bc_neu = split(x_bc, [split_point, shape(x_bc)[0]-split_point], axis=0)
+    y_bc_dir, y_bc_neu = split(y_bc, [split_point, shape(x_bc)[0]-split_point], axis=0)
 
     # predict the values for the Dirichlet boundaries
     y_bc_dir_pred = model(x_bc_dir)
@@ -226,7 +226,7 @@ def train(model, x_train, x_bc, y_bc, loss_func, lr_schedule=None,
         if batch is not None:
             loss = 0
             for batch in x_batched:
-                loss += distributed_train_step(strategy, model, batch, x_bc, 
+                loss += distributed_train_step(strategy, model, batch, x_bc,
                                                y_bc, loss_func, optimizer)
         else:
             loss = train_step(model, x_train, x_bc, y_bc, loss_func, optimizer)

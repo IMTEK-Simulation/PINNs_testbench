@@ -61,7 +61,7 @@ def set_2D_boundaries(x_bc, y_bc, vec_sec_dim):
 
     # extend the boundary value tensors to match the length of the vec_sec
     # if the nummber of conditions are >2 then reduce the dimension to match x
-    y_extended = [tf.constant(i, shape=(vec_sec_dim.shape[0] - int(idx>=2) * 2, 1))
+    y_extended = [tf.constant(i, shape=(vec_sec_dim.shape[0] - int(idx >= 2) * 2, 1))
                   for idx, i in enumerate(y_bc)]
     # join the values for the upper and lower positons
     y = tf.concat(y_extended, axis=0)
